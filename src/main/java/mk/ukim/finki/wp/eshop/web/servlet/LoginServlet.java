@@ -1,6 +1,7 @@
 package mk.ukim.finki.wp.eshop.web.servlet;
 
 import mk.ukim.finki.wp.eshop.model.User;
+import mk.ukim.finki.wp.eshop.model.exceptions.InvalidArgumentsException;
 import mk.ukim.finki.wp.eshop.model.exceptions.InvalidUserCredentialsException;
 import mk.ukim.finki.wp.eshop.service.AuthService;
 import org.thymeleaf.context.WebContext;
@@ -38,11 +39,12 @@ public class LoginServlet extends HttpServlet {
         User user = null;
         try {
             user = authService.login(username,password);
-        } catch (InvalidUserCredentialsException ex) {
+        } catch (InvalidUserCredentialsException | InvalidArgumentsException ex ) {
             WebContext context = new WebContext(req,resp,req.getServletContext());
             context.setVariable("hasError",true);
             context.setVariable("error",ex.getMessage());
             springTemplateEngine.process("login.html",context,resp.getWriter());
+            return;
         }
         req.getSession().setAttribute("user",user);
         resp.sendRedirect("/servlet/thymeleaf/category");
