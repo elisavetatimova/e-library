@@ -1,10 +1,7 @@
 package mk.ukim.finki.wp.eshop.bootstrap;
 
 import lombok.Getter;
-import mk.ukim.finki.wp.eshop.model.Category;
-import mk.ukim.finki.wp.eshop.model.Manufacturer;
-import mk.ukim.finki.wp.eshop.model.Product;
-import mk.ukim.finki.wp.eshop.model.User;
+import mk.ukim.finki.wp.eshop.model.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +16,7 @@ public class DataHolder {
     public static List<User> users = new ArrayList<>();
     public static List<Product> products = new ArrayList<>();
     public static List<Manufacturer> manufacturers = new ArrayList<>();
+    public static List<ShoppingCart> shoppingCarts = new ArrayList<>();
 
     @PostConstruct
     public void init() {
