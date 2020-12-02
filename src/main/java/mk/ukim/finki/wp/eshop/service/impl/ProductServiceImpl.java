@@ -5,11 +5,15 @@ import mk.ukim.finki.wp.eshop.model.exceptions.CategoryNotFoundException;
 import mk.ukim.finki.wp.eshop.model.Manufacturer;
 import mk.ukim.finki.wp.eshop.model.Product;
 import mk.ukim.finki.wp.eshop.model.exceptions.ManufacturerNotFoundException;
-import mk.ukim.finki.wp.eshop.repository.InMemoryCategoryRepository;
-import mk.ukim.finki.wp.eshop.repository.InMemoryManufacturerRepository;
-import mk.ukim.finki.wp.eshop.repository.InMemoryProductRepository;
+import mk.ukim.finki.wp.eshop.repository.impl.InMemoryCategoryRepository;
+import mk.ukim.finki.wp.eshop.repository.impl.InMemoryManufacturerRepository;
+import mk.ukim.finki.wp.eshop.repository.impl.InMemoryProductRepository;
+import mk.ukim.finki.wp.eshop.repository.jpa.CategoryRepository;
+import mk.ukim.finki.wp.eshop.repository.jpa.ManufacturerRepository;
+import mk.ukim.finki.wp.eshop.repository.jpa.ProductRepository;
 import mk.ukim.finki.wp.eshop.service.ProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,14 +21,14 @@ import java.util.Optional;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private final InMemoryProductRepository productRepository;
-    private final InMemoryManufacturerRepository manufacturerRepository;
-    private final InMemoryCategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final ManufacturerRepository manufacturerRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(InMemoryProductRepository inMemoryProductRepository,
-                              InMemoryManufacturerRepository manufacturerRepository,
-                              InMemoryCategoryRepository categoryRepository) {
-        this.productRepository = inMemoryProductRepository;
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ManufacturerRepository manufacturerRepository,
+                              CategoryRepository categoryRepository) {
+        this.productRepository = productRepository;
         this.manufacturerRepository = manufacturerRepository;
         this.categoryRepository = categoryRepository;
     }
@@ -45,12 +49,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Optional<Product> save(String name, Double price, Integer quantity, Long categoryId, Long manufacturerId) {
         Category category = this.categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
         Manufacturer manufacturer = this.manufacturerRepository.findById(manufacturerId)
                 .orElseThrow(() -> new ManufacturerNotFoundException(manufacturerId));
-        return this.productRepository.save(name, price, quantity, category, manufacturer);
+
+        this.productRepository.deleteByName(name);
+        return Optional.of(this.productRepository.save(new Product(name, price, quantity, category, manufacturer)));
     }
 
     @Override

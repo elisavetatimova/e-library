@@ -4,16 +4,18 @@ import mk.ukim.finki.wp.eshop.model.User;
 import mk.ukim.finki.wp.eshop.model.exceptions.InvalidArgumentsException;
 import mk.ukim.finki.wp.eshop.model.exceptions.InvalidUserCredentialsException;
 import mk.ukim.finki.wp.eshop.model.exceptions.PasswordsDoNotMatchException;
-import mk.ukim.finki.wp.eshop.repository.InMemoryUserRepository;
+import mk.ukim.finki.wp.eshop.model.exceptions.UsernameAlreadyExistsException;
+import mk.ukim.finki.wp.eshop.repository.impl.InMemoryUserRepository;
+import mk.ukim.finki.wp.eshop.repository.jpa.UserRepository;
 import mk.ukim.finki.wp.eshop.service.AuthService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final InMemoryUserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public AuthServiceImpl(InMemoryUserRepository userRepository) {
+    public AuthServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -28,13 +30,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User register(String username, String password, String repeatPassword, String name, String surname) {
-        if (username==null || username.isEmpty()  || password==null || password.isEmpty()) {
+        if (username==null || username.isEmpty()  || password==null || password.isEmpty())
             throw new InvalidArgumentsException();
-        }
-        if (!password.equals(repeatPassword)) {
+        if (!password.equals(repeatPassword))
             throw new PasswordsDoNotMatchException();
-        }
+        if(this.userRepository.findByUsername(username).isPresent()
+                || !this.userRepository.findByUsername(username).isEmpty())
+            throw new UsernameAlreadyExistsException(username);
+
         User user = new User(username,password,name,surname);
-        return userRepository.saveOrUpdate(user);
+        return userRepository.save(user);
     }
 }
