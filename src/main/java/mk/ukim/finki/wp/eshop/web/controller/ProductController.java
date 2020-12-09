@@ -36,7 +36,8 @@ public class ProductController {
         }
         List<Product> products = this.productService.findAll();
         model.addAttribute("products", products);
-        return "products";
+        model.addAttribute("bodyContent","products");
+        return "master-template";
     }
 
     @DeleteMapping("/delete/{id}")
@@ -65,7 +66,8 @@ public class ProductController {
         List<Category> categories = this.categoryService.listCategories();
         model.addAttribute("manufacturers", manufacturers);
         model.addAttribute("categories", categories);
-        return "add-product";
+        model.addAttribute("bodyContent","add-product");
+        return "master-template";
     }
 
     @PostMapping("/add")
