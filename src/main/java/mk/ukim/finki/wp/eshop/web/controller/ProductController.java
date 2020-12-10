@@ -6,6 +6,7 @@ import mk.ukim.finki.wp.eshop.model.Product;
 import mk.ukim.finki.wp.eshop.service.CategoryService;
 import mk.ukim.finki.wp.eshop.service.ManufacturerService;
 import mk.ukim.finki.wp.eshop.service.ProductService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -55,12 +56,14 @@ public class ProductController {
             model.addAttribute("manufacturers", manufacturers);
             model.addAttribute("categories", categories);
             model.addAttribute("product", product);
-            return "add-product";
+            model.addAttribute("bodyContent","add-product");
+            return "master-template";
         }
         return "redirect:/products?error=ProductNotFound";
     }
 
     @GetMapping("/add-form")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String addProductPage(Model model) {
         List<Manufacturer> manufacturers = this.manufacturerService.findAll();
         List<Category> categories = this.categoryService.listCategories();

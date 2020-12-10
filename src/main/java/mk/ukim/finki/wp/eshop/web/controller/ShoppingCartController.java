@@ -3,6 +3,7 @@ package mk.ukim.finki.wp.eshop.web.controller;
 import mk.ukim.finki.wp.eshop.model.ShoppingCart;
 import mk.ukim.finki.wp.eshop.model.User;
 import mk.ukim.finki.wp.eshop.service.ShoppingCartService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +28,11 @@ public class ShoppingCartController {
             model.addAttribute("hasError", true);
             model.addAttribute("error", error);
         }
-        User user = (User) req.getSession().getAttribute("user");
-        ShoppingCart shoppingCart = this.shoppingCartService.getActiveShoppingCart(user.getUsername());
+        String username = (String) req.getRemoteUser();
+        ShoppingCart shoppingCart = this.shoppingCartService.getActiveShoppingCart(username);
         model.addAttribute("products", this.shoppingCartService.listAllProductsInShoppingCart(shoppingCart.getId()));
-        return "shopping-cart";
+        model.addAttribute("bodyContent","shopping-cart");
+        return "master-template";
     }
 
     @PostMapping("/add-product/{id}")
