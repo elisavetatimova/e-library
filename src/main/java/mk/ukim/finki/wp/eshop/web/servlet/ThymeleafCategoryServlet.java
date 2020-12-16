@@ -24,18 +24,19 @@ public class ThymeleafCategoryServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         WebContext context = new WebContext(req,resp,req.getServletContext());
         context.setVariable("ipAddress",req.getRemoteAddr());
         context.setVariable("clientAgent",req.getHeader("User-Agent"));
         context.setVariable("categories",categoryService.listCategories());
+        resp.setContentType("application/xhtml+xml");
         this.springTemplateEngine.process("categories.html", context,resp.getWriter());
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String categoryName = (String)req.getParameter("name");
-        String categoryDesc = (String) req.getParameter("description");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String categoryName = req.getParameter("name");
+        String categoryDesc = req.getParameter("description");
         categoryService.create(categoryName,categoryDesc);
         resp.sendRedirect("/servlet/thymeleaf/category");
     }
