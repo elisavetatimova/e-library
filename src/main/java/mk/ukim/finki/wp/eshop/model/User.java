@@ -26,12 +26,11 @@ public class User implements UserDetails {
 
     private boolean isAccountNonExpired = true;
     private boolean isAccountNonLocked = true;
-    private boolean isCredentialsNonExpired =  true;
+    private boolean isCredentialsNonExpired = true;
     private boolean isEnabled = true;
 
     @Enumerated(value = EnumType.STRING)
     private Role role;
-
 
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
