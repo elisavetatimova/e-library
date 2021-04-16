@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -31,10 +29,6 @@ public class User implements UserDetails {
 
     @Enumerated(value = EnumType.STRING)
     private Role role;
-
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<ShoppingCart> carts;
 
     public User() {
     }

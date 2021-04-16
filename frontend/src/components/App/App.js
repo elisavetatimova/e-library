@@ -1,23 +1,22 @@
 import './App.css';
 import React, {Component} from "react";
 import {BrowserRouter as Router, Redirect, Route} from 'react-router-dom'
-import Manufacturers from '../Manufacturers/manufacturers';
 import Categories from '../Categories/categories';
-import Products from '../Products/ProductList/products';
+import Books from '../Books/BookList/books';
 import Header from '../Header/header';
-import ProductAdd from '../Products/ProductAdd/productAdd';
-import EShopService from "../../repository/eshopRepository";
-import ProductEdit from "../Products/ProductEdit/productEdit";
+import BookAdd from '../Books/BookAdd/bookAdd';
+import ELibraryService from "../../repository/eLibraryRepository";
+import BookEdit from "../Books/BookEdit/bookEdit";
 
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      manufacturers: [],
-      products: [],
+      authors: [],
+      books: [],
       categories: [],
-      selectedProduct: {}
+      selectedBook: {}
     }
   }
 
@@ -27,24 +26,23 @@ class App extends Component {
           <Header/>
           <main>
             <div className="container">
-              <Route path={"/manufacturers"} exact render={() =>
-                  <Manufacturers manufacturers={this.state.manufacturers}/>}/>
               <Route path={"/categories"} exact render={() =>
                   <Categories categories={this.state.categories}/>}/>
-              <Route path={"/products/add"} exact render={() =>
-                  <ProductAdd categories={this.state.categories}
-                              manufacturers={this.state.manufacturers}
-                              onAddProduct={this.addProduct}/>}/>
-              <Route path={"/products/edit/:id"} exact render={() =>
-                  <ProductEdit categories={this.state.categories}
-                               manufacturers={this.state.manufacturers}
-                               onEditProduct={this.editProduct}
-                               product={this.state.selectedProduct}/>}/>
-              <Route path={"/products"} exact render={() =>
-                  <Products products={this.state.products}
-                            onDelete={this.deleteProduct}
-                            onEdit={this.getProduct}/>}/>
-              <Redirect to={"/products"}/>
+              <Route path={"/books/add"} exact render={() =>
+                  <BookAdd categories={this.state.categories}
+                              authors={this.state.authors}
+                              onAddBook={this.addBook}/>}/>
+              <Route path={"/books/edit/:id"} exact render={() =>
+                  <BookEdit categories={this.state.categories}
+                               authors={this.state.authors}
+                               onEditBook={this.editBook}
+                               book={this.state.selectedBook}/>}/>
+              <Route path={"/books"} exact render={() =>
+                  <Books books={this.state.books}
+                            onDelete={this.deleteBook}
+                            onMarkAsTaken={this.takeBook}
+                            onEdit={this.getBook}/>}/>
+              <Redirect to={"/books"}/>
             </div>
           </main>
         </Router>
@@ -52,31 +50,31 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.loadManufacturers();
+    this.loadAuthors();
     this.loadCategories();
-    this.loadProducts();
+    this.loadBooks();
   }
 
-  loadManufacturers = () => {
-    EShopService.fetchManufacturers()
+  loadAuthors = () => {
+    ELibraryService.fetchAuthors()
         .then((data) => {
           this.setState({
-            manufacturers: data.data
+            authors: data.data
           })
         });
   }
 
-  loadProducts = () => {
-    EShopService.fetchProducts()
+  loadBooks = () => {
+    ELibraryService.fetchBooks()
         .then((data) => {
           this.setState({
-            products: data.data
+            books: data.data
           })
         });
   }
 
   loadCategories = () => {
-    EShopService.fetchCategories()
+    ELibraryService.fetchCategories()
         .then((data) => {
           this.setState({
             categories: data.data
@@ -84,33 +82,40 @@ class App extends Component {
         });
   }
 
-  deleteProduct = (id) => {
-    EShopService.deleteProduct(id)
+  deleteBook = (id) => {
+    ELibraryService.deleteBook(id)
         .then(() => {
-          this.loadProducts();
+          this.loadBooks();
         });
   }
 
-  addProduct = (name, price, quantity, category, manufacturer) => {
-    EShopService.addProduct(name, price, quantity, category, manufacturer)
+  takeBook = (id) => {
+    ELibraryService.takeBook(id)
         .then(() => {
-          this.loadProducts();
+            this.loadBooks();
         });
   }
 
-  getProduct = (id) => {
-    EShopService.getProduct(id)
+  addBook = (name, price, category, author, availableCopies) => {
+    ELibraryService.addBook(name, price, category, author, availableCopies)
+        .then(() => {
+          this.loadBooks();
+        });
+  }
+
+  getBook = (id) => {
+    ELibraryService.getBook(id)
         .then((data) => {
           this.setState({
-            selectedProduct: data.data
+            selectedBook: data.data
           })
         })
   }
 
-  editProduct = (id, name, price, quantity, category, manufacturer) => {
-    EShopService.editProduct(id, name, price, quantity, category, manufacturer)
+  editBook = (id, name, price, category, author, availableCopies) => {
+    ELibraryService.editBook(id, name, price, category, author, availableCopies)
         .then(() => {
-          this.loadProducts();
+          this.loadBooks();
         });
   }
 }
